@@ -21,7 +21,8 @@ from genmo.mochi_preview.pipelines import (
 pipeline = None
 model_dir_path = None
 lora_path = None
-num_gpus = torch.cuda.device_count()
+num_gpus = 1 # torch.cuda.device_count()
+torch.backends.cuda.enable_math_sdp(True)
 cpu_offload = False
 
 

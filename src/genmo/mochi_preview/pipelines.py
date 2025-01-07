@@ -453,12 +453,12 @@ def sample_model(device, dit, conditioning, **args):
 
     def model_fn(*, z, sigma, cfg_scale):
         if cond_batched:
-            with torch.autocast("cuda", dtype=torch.bfloat16):
+            with torch.autocast("cpu", dtype=torch.bfloat16):
                 out = dit(z, sigma, **cond_batched)
             out_cond, out_uncond = torch.chunk(out, chunks=2, dim=0)
         else:
             nonlocal cond_text, cond_null
-            with torch.autocast("cuda", dtype=torch.bfloat16):
+            with torch.autocast("cpu", dtype=torch.bfloat16):
                 out_cond = dit(z, sigma, **cond_text)
                 out_uncond = dit(z, sigma, **cond_null)
         assert out_cond.shape == out_uncond.shape
@@ -520,7 +520,7 @@ class MochiSingleGPUPipeline:
         fast_init=True,
         strict_load=True
     ):
-        self.device = torch.device("cuda:0")
+        self.device = torch.device("cpu")
         self.tokenizer = t5_tokenizer(text_encoder_factory.model_dir)
         t = Timer()
         self.cpu_offload = cpu_offload

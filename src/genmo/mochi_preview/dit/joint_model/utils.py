@@ -1,5 +1,6 @@
 from typing import Optional, Tuple
 
+import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -87,13 +88,22 @@ class AttentionPool(nn.Module):
         q = q.unsqueeze(2)  # (B, H, 1, head_dim)
 
         # Compute attention.
-        x = F.scaled_dot_product_attention(q, k, v, attn_mask=attn_mask, dropout_p=0.0)  # (B, H, 1, head_dim)
+        # x = F.scaled_dot_product_attention(q, k, v, attn_mask=attn_mask, dropout_p=0.0)  # (B, H, 1, head_dim)
+        x = manual_attention(q, k, v, attn_mask=attn_mask)
 
         # Concatenate heads and run output.
         x = x.squeeze(2).flatten(1, 2)  # (B, D = H * head_dim)
         x = self.to_out(x)
         return x
 
+# Blindly copied the following from Claude Sonnet
+def manual_attention(q, k, v, attn_mask=None):
+    d_k = q.size(-1)
+    scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(d_k)
+    if attn_mask is not None:
+        scores = scores.masked_fill(attn_mask == 0, float('-inf'))
+    attn = torch.softmax(scores, dim=-1)
+    return torch.matmul(attn, v)
 
 def pad_and_split_xy(xy, indices, B, N, L, dtype) -> Tuple[torch.Tensor, torch.Tensor]:
     D = xy.size(1)

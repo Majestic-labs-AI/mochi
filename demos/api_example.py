@@ -19,8 +19,9 @@ pipeline = MochiSingleGPUPipeline(
     text_encoder_factory=T5ModelFactory(),
     dit_factory=DitModelFactory(model_path=f"{MOCHI_DIR}/dit.safetensors", model_dtype="bf16"),
     decoder_factory=DecoderModelFactory(
-        model_path=f"{MOCHI_DIR}/vae.safetensors",
-        model_stats_path=f"{MOCHI_DIR}/vae_stats.json",
+        # Fix 'FileNotFoundError: No such file or directory: "/mnt/work/mochi/weights/vae.safetensors"'
+        model_path=f"{MOCHI_DIR}/decoder.safetensors",
+        # model_stats_path=f"{MOCHI_DIR}/vae_stats.json",
     ),
     cpu_offload=True,
     decode_type="tiled_full",
