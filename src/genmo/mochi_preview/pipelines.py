@@ -137,6 +137,7 @@ class DitModelFactory(ModelFactory):
         attention_mode: Optional[str] = None
     ):
         # Infer attention mode if not specified
+        attention_mode = "sdpa"
         if attention_mode is None:
             from genmo.lib.attn_imports import flash_varlen_attn  # type: ignore
             attention_mode = "sdpa" if flash_varlen_attn is None else "flash"
@@ -200,7 +201,7 @@ class DitModelFactory(ModelFactory):
             t5_feat_dim=4096,
             t5_token_length=256,
             rope_theta=10000.0,
-            attention_mode=self.kwargs["attention_mode"],
+            attention_mode="sdpa",
             **model_kwargs,
         )
 

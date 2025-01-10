@@ -66,6 +66,7 @@ class AsymmetricAttention(nn.Module):
     ):
         super().__init__()
         self.attention_mode = attention_mode
+        self.attention_mode = "sdpa"
         self.dim_x = dim_x
         self.dim_y = dim_y
         self.num_heads = num_heads
