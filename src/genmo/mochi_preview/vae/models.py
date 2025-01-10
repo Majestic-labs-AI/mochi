@@ -12,6 +12,7 @@ from genmo.lib.progress import get_new_progress_bar
 from genmo.mochi_preview.vae.cp_conv import cp_pass_frames, gather_all_frames
 from genmo.mochi_preview.vae.latent_dist import LatentDistribution
 import genmo.mochi_preview.vae.cp_conv as cp_conv
+from torch.nn.attention import SDPBackend, sdpa_kernel
 
 
 def cast_tuple(t, length=1):
@@ -393,7 +394,9 @@ class Attention(nn.Module):
             for i in range(0, qkv.size(0), chunk_size):
                 qkv_chunk = qkv[i:i+chunk_size]
                 qc, kc, vc = prepare_for_attention(qkv_chunk, self.head_dim, qk_norm=self.qk_norm)
-                chunk = F.scaled_dot_product_attention(qc, kc, vc, **attn_kwargs)
+                # Only enable math attention backend
+                with sdpa_kernel(SDPBackend.MATH):
+                    chunk = F.scaled_dot_product_attention(qc, kc, vc, **attn_kwargs)
                 assert chunk.size(0) == qc.size(0)
                 x[i:i+chunk_size].copy_(chunk)
 

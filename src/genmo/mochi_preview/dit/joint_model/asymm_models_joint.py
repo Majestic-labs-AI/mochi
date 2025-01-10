@@ -225,7 +225,7 @@ class AsymmetricAttention(nn.Module):
         assert self.num_heads % cp_size == 0
         local_heads = self.num_heads // cp_size
         local_dim = local_heads * self.head_dim
-
+        self.attention_mode = "sdpa"
         # Check shapes
         assert q.ndim == 3 and k.ndim == 3 and v.ndim == 3
         total = q.size(0)
