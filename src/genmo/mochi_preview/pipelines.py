@@ -245,7 +245,7 @@ class DitModelFactory(ModelFactory):
             )
         elif isinstance(device_id, int):
             model = model.to(torch.device(f"cuda:{device_id}"))
-        return model.eval()
+        return torch.compile(model.eval())
 
 
 class DecoderModelFactory(ModelFactory):
