@@ -15,7 +15,7 @@ num_frames=97
 while [ $# -gt 0 ]; do
     height=$1
     width=$2
-    python3 ./demos/cli.py \
+    numactl --cpunodebind=0 --membind=0 python3 ./demos/cli.py \
         --model_dir weights/ \
         --cpu_offload \
         --num_frames $num_frames \
