@@ -40,6 +40,7 @@ from genmo.mochi_preview.vae.models import (
     decode_latents_tiled_spatial,
 )
 from genmo.mochi_preview.vae.vae_stats import dit_latents_to_vae_latents
+import intel_extension_for_pytorch as ipex
 
 
 def load_to_cpu(p, weights_only=True):
@@ -245,7 +246,7 @@ class DitModelFactory(ModelFactory):
             )
         elif isinstance(device_id, int):
             model = model.to(torch.device(f"cuda:{device_id}"))
-        return torch.compile(model.eval())
+        return torch.compile(ipex.optimize(model.eval(),dtype=torch.bfloat16), backend="ipex")
 
 
 class DecoderModelFactory(ModelFactory):
@@ -275,7 +276,7 @@ class DecoderModelFactory(ModelFactory):
         decoder.load_state_dict(state_dict, strict=True)
         device = torch.device(f"cuda:{device_id}") if isinstance(device_id, int) else "cpu"
         decoder.eval().to(device)
-        return decoder
+        return decoder 
 
 
 class EncoderModelFactory(ModelFactory):

@@ -15,7 +15,7 @@ except ImportError:
 
 from torch.nn.attention import SDPBackend, sdpa_kernel
 
-training_backends = [SDPBackend.MATH]
+training_backends = [SDPBackend.FLASH_ATTENTION]
 eval_backends = list(training_backends)
 # if torch.cuda.get_device_properties(0).major >= 9.0:
 #     # Enable fast CuDNN attention on Hopper.
